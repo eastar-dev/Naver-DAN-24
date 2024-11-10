@@ -1,0 +1,21 @@
+apply plugin: "org.jetbrains.kotlin.kapt"
+apply plugin: 'com.google.dagger.hilt.android'
+
+//https://dagger.dev/hilt/gradle-setup.html
+dependencies {
+    implementation(libs.google.hilt.android)
+    kapt(libs.google.hilt.compiler)
+    kapt(libs.google.hilt.ext.compiler)
+
+    // For instrumentation tests
+    androidTestImplementation(libs.google.hilt.android.testing)
+    kaptAndroidTest(libs.google.hilt.compiler)
+
+    // For local unit tests
+    testImplementation(libs.google.hilt.android.testing)
+    kaptTest(libs.google.hilt.compiler)
+}
+
+kapt {
+    correctErrorTypes true
+}

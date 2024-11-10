@@ -1,0 +1,203 @@
+android {
+    compileSdk = libs.versions.compileSdk.get().toInteger()
+    defaultConfig {
+        versionCode = libs.versions.versionCode.get().toInteger()
+        versionName = libs.versions.versionName.get().toString()
+        minSdk = libs.versions.minSdk.get().toInteger()
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildFeatures.buildConfig = true
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    //https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
+    //https://github.com/android/compose-samples/blob/139b19266c37cbfbf79da66d6f0140a3211c146a/Crane/app/build.gradle.kts#L79
+    //kotlinOptions {
+    //    jvmTarget = JavaVersion.VERSION_19.toString()
+    //}
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(rootProject.file("release.jks"))
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        debug {
+            isDefault true
+            signingConfig signingConfigs.config
+        }
+        release {
+            signingConfig signingConfigs.config
+        }
+    }
+
+    flavorDimensions "api"
+    productFlavors {
+        dev {
+            dimension "api"
+            buildConfigField "String", "api", "\"dev\""
+        }
+        stage {
+            dimension "api"
+            buildConfigField "String", "api", "\"stage\""
+        }
+        real {
+            dimension "api"
+            buildConfigField "String", "api", "\"real\""
+        }
+    }
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (names.contains("dev") && variant.buildType.name == "release") {
+            setIgnore(true)
+        }
+        //if (names.contains("stage") && variant.buildType.name == "debug") setIgnore(false) else setIgnore(true)
+        //if (names.contains("real") && variant.buildType.name == "debug") setIgnore(false) else setIgnore(true)
+        //if (names.contains("stage") && variant.buildType.name == "release") setIgnore(false) else setIgnore(true)
+    }
+}
+android {
+    packagingOptions {
+        //compose 관련 코드들은 exclude되면 안되므로 META-INF/* 를 하면 안됩니다.
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.md'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+    }
+}
+
+//log
+dependencies {
+    debugImplementation("dev.eastar:eastar-log:2.5.0")
+    releaseImplementation("dev.eastar:eastar-log-no-op:2.5.0")
+}
+//coroutines
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+}
+//firebase
+//https://firebase.google.com/docs/crashlytics/get-started?platform=android&authuser=0#add-plugin
+//apply plugin: 'com.google.firebase.crashlytics'
+
+dependencies {
+    //https://firebase.google.com/docs/android/setup#add-sdks
+    implementation platform(libs.google.firebase)
+
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+}
+dependencies {
+    implementation(libs.kotlin.stdlib)
+}
+
+//junit5
+// Unit5 Tests on the JUnit Platform
+apply plugin: 'de.mannodermaus.android-junit5'
+android {
+    defaultConfig {
+        testInstrumentationRunnerArguments runnerBuilder: 'de.mannodermaus.junit5.AndroidJUnit5Builder'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+    //compileOptions {
+    //    sourceCompatibility JavaVersion.VERSION_11
+    //    targetCompatibility JavaVersion.VERSION_11
+    //}
+    //kotlinOptions {
+    //    jvmTarget = JavaVersion.VERSION_11.toString()
+    //}
+}
+
+dependencies {
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+    testImplementation('org.junit.jupiter:junit-jupiter-params:5.10.2')
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly('org.junit.vintage:junit-vintage-engine:5.10.2')
+
+    androidTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+
+    androidTestImplementation('de.mannodermaus.junit5:android-test-core:1.4.0')
+    androidTestRuntimeOnly('de.mannodermaus.junit5:android-test-runner:1.4.0')
+}
+android {
+    packagingOptions {
+        exclude "META-INF/LGPL2.1"
+    }
+}
+junitPlatform {
+    // Don't raise errors about incorrect configuration
+    // of JUnit 5 instrumentation tests
+    instrumentationTests {
+        integrityCheckEnabled = false
+    }
+}
+
+//mockito
+dependencies {
+    testImplementation('org.mockito:mockito-junit-jupiter:5.10.0')
+    testImplementation('org.mockito:mockito-core:5.10.0')
+    testImplementation('org.mockito:mockito-inline:5.2.0')
+    testImplementation('org.mockito.kotlin:mockito-kotlin:5.2.1')
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
+    androidTestImplementation('de.mannodermaus.junit5:android-test-core:1.4.0')
+    androidTestRuntimeOnly('de.mannodermaus.junit5:android-test-runner:1.4.0')
+}
+
+//test
+dependencies {
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.5.0')
+
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation('androidx.test:runner:1.5.0')
+}
+
+//robolectric
+dependencies {
+    testImplementation('org.robolectric:robolectric:4.11.1')
+}
+
+//asserting
+dependencies {
+    testImplementation(libs.google.truth) {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    androidTestImplementation("androidx.test.ext:truth:1.5.0")
+    //androidTestImplementation(libs.google.truth) {
+    //    exclude group: 'com.google.guava', module: 'listenablefuture'
+    //}
+}

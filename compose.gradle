@@ -1,0 +1,76 @@
+
+//https://developer.android.com/develop/ui/compose/compiler
+//alias(libs.plugins.compose.compiler)
+apply plugin: "org.jetbrains.kotlin.plugin.compose"
+
+//compose
+//https://developer.android.com/jetpack/compose/bom/bom-mapping
+//https://developer.android.com/jetpack/androidx/releases/compose-compiler#declaring_dependencies
+//https://developer.android.com/jetpack/androidx/releases/compose#versions
+//https://developer.android.com/jetpack/compose/setup#setup-compose
+//https://developer.android.com/jetpack/compose/setup#bom-version-mapping
+//https://developer.android.com/jetpack/androidx/releases/compose-kotlin
+android {
+    buildFeatures {
+        compose = true
+    }
+
+    //https://android-developers.googleblog.com/2024/04/jetpack-compose-compiler-moving-to-kotlin-repository.html
+    //composeOptions {
+    //    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+    //}
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
+
+    //reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    //stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+}
+
+dependencies {
+    //https://developer.android.com/jetpack/compose/bom
+    //https://developer.android.com/jetpack/compose/bom/bom-mapping
+    implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewModel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.compose.animation)
+    // UI Tests
+    //androidTestImplementation ("androidx.compose.ui:ui-test-junit4")
+    //debugImplementation ("androidx.compose.ui:ui-test-manifest")
+
+    implementation("androidx.compose.material3:material3")
+
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.foundation:foundation-layout")
+
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-util")
+    implementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.ui:ui-test-junit4")
+
+
+    implementation("androidx.compose.runtime:runtime")
+    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.compose.runtime:runtime-rxjava2")
+
+    implementation("androidx.compose.animation:animation")
+
+    implementation("androidx.compose.ui:ui-viewbinding")
+    //se 버전에 영향이 있어서 버전을 올리고 나서 글쓰기 이미지 첨부가 되는지확인해야 한다.
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.lottie.compose)
+
+    implementation(libs.bundles.orbit)
+    //https://developer.android.com/jetpack/androidx/releases/constraintlayout#constraintlayout-compose-1.0.1
+    implementation(libs.androidx.constraintlayout.compose)
+}
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--application AppCompat 적용 Login 모듈에서 사용 -->
+    <application
+        android:name=".__Package__Application"
+        android:label="__Package__"
+        android:theme="@style/CdsTheme">
+        <activity
+            android:name=".__Package__"
+            android:exported="true"
+            android:label="__Package__">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

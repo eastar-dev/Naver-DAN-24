@@ -1,0 +1,29 @@
+//room
+apply plugin: "org.jetbrains.kotlin.kapt"
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                    "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                    "room.incremental"     : "true",
+                    "room.expandProjection": "true"]
+            }
+        }
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+}
+dependencies {
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room)
+    kapt(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.room.paging)
+
+    testImplementation(libs.androidx.room.testing)
+
+    //implementation(libs.androidx.room.rxjava2)
+}

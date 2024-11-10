@@ -1,0 +1,22 @@
+#!/bin/bash
+commit_message=$(cat $1)
+branch_name=$(git branch --show-current)
+branch_message=$(echo "$branch_name" | sed -r "s/^feature\/(.*)/\1/") # remove feature/
+ticket_no=$(echo "$branch_message" | sed -r "s/(.*)(TICKET-[0-9]+).*/\2/") # ticket number 부분이 추출이 안되면 전체문자열이 들어온다
+commit_message_branch=$(echo "$branch_message" | sed -r "s/^TICKET-[0-9 -]+(.*)/\1/" )
+
+if [ ${#commit_message} -lt 2 ]; then
+    commit_message="$commit_message_branch"
+fi
+
+if [ "${commit_message:0:1}" != "[" ] ; then
+    if [ "${branch_message}" = "${ticket_no}" ] ; then
+        commit_message="[NO-TICKET] ${commit_message}"
+    else
+        commit_message="[${ticket_no}] ${commit_message}"
+    fi
+fi
+
+echo "$commit_message" > $1
+
+exit 0
